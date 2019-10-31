@@ -1,0 +1,17 @@
+artellapipe.libs.drive package
+==============================
+
+Subpackages
+-----------
+
+.. toctree::
+
+   artellapipe.libs.drive.core
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.libs.drive
+   :members:
+   :undoc-members:
+   :show-inheritance:

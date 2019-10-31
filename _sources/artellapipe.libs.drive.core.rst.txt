@@ -1,0 +1,10 @@
+artellapipe.libs.drive.core package
+===================================
+
+Module contents
+---------------
+
+.. automodule:: artellapipe.libs.drive.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
