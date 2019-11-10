@@ -1,6 +1,13 @@
 artellapipe.libs.drive.core package
 ===================================
 
+Submodules
+----------
+
+.. toctree::
+
+   artellapipe.libs.drive.core.tracking
+
 Module contents
 ---------------
 
