@@ -71,7 +71,8 @@ class DriveTrackingManager(tracking.TrackingManager, object):
                         found_worksheets[worksheet_name].append(worksheet)
                     except gspread.models.WorksheetNotFound as exc:
                         LOGGER.warning(
-                            'Production Tracking Worksheet: "{}" does not exists in sheet: "{}"!'.format(worksheet_name, sheet))
+                            'Production Tracking Worksheet: "{}" does not exists in sheet: "{}"!'.format(
+                                worksheet_name, sheet))
                         continue
 
             for worksheet_name, worksheets_list in found_worksheets.items():
