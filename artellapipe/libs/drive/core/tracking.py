@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Module that contains base abstract tracking class for Artella projects
+Module that contains Drive tracking class for Artella projects
 """
 
 from __future__ import print_function, division, absolute_import
@@ -20,7 +20,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 # from artellapipe.libs.drive.externals.oauth2client.service_account import ServiceAccountCredentials
 
-from tpPyUtils import decorators, python
+from tpDcc.libs.python import decorators, python
 
 import artellapipe.register
 from artellapipe.managers import tracking
