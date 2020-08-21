@@ -1,12 +1,7 @@
 # ===================================================================
 # artellapipe-libs-drive requirements file
 # ===================================================================
-gspread
-oauth2client
-pytest
-pytest-cov
-coveralls
-sphinx
-sphinx_rtd_theme
+gspread==3.6.0
+oauth2client==4.1.3
 tpDcc-libs-python
 artellapipe
