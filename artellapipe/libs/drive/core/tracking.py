@@ -18,42 +18,37 @@ import traceback
 
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-# from artellapipe.libs.drive.externals.oauth2client.service_account import ServiceAccountCredentials
 
-from tpDcc.libs.python import decorators, python
+from tpDcc.libs.python import python
 
-import artellapipe.register
 from artellapipe.managers import tracking
 import artellapipe.libs.drive as drive_lib
 
-LOGGER = logging.getLogger()
+LOGGER = logging.getLogger('artellapipe-libs-drive')
 
 
-@decorators.Singleton
 class DriveTrackingManager(tracking.TrackingManager, object):
 
-    def __init__(self):
-        tracking.TrackingManager.__init__(self)
-        self._client = None
-        self._spreadsheets = list()
-        self._worksheets = dict()
+    _client = None
+    _spreadsheets = list()
+    _worksheets = dict()
 
     @property
     def spreadsheets(self):
-        return self._spreadsheets
+        return self.__class__._spreadsheets
 
     @property
     def worksheets(self):
-        return self._worksheets
+        return self.__class__._worksheets
 
     def update_tracking_info(self):
 
-        python.clear_list(self._spreadsheets)
-        self._worksheets.clear()
+        python.clear_list(self.__class__._spreadsheets)
+        self.__class__._worksheets.clear()
 
         try:
             valid_login = self.login()
-            if not valid_login and self._client:
+            if not valid_login and self.__class__._client:
                 LOGGER.error("Production Tracking was not loaded successfully!")
                 return False
 
@@ -63,7 +58,7 @@ class DriveTrackingManager(tracking.TrackingManager, object):
                 return False
 
             found_worksheets = dict()
-            for sheet in self._spreadsheets:
+            for sheet in self.__class__._spreadsheets:
                 for worksheet_name, worksheet_data in worksheets.items():
                     found_worksheets[worksheet_name] = list()
                     try:
@@ -78,13 +73,13 @@ class DriveTrackingManager(tracking.TrackingManager, object):
             for worksheet_name, worksheets_list in found_worksheets.items():
                 if not worksheets_list:
                     LOGGER.warning('No worksheets with name "{}" found in registered spreadsheets: {}'.format(
-                        worksheet_name, self._spreadsheets))
+                        worksheet_name, self.__class__._spreadsheets))
                     continue
                 if len(worksheets_list) > 1:
                     LOGGER.warning(
                         'Multiple worksheets found name "{}" in registered spreadsheets: {}. '
                         'Only first one will be used'.format(worksheet_name, worksheets_list))
-                self._worksheets[worksheet_name] = worksheets_list[0]
+                self.__class__._worksheets[worksheet_name] = worksheets_list[0]
         except Exception as exc:
             LOGGER.error('Error while getting information from Drive: {} | {}'.format(exc, traceback.format_exc()))
 
@@ -96,15 +91,15 @@ class DriveTrackingManager(tracking.TrackingManager, object):
 
         self.check_update()
 
-        if not self._client:
+        if not self.__class__._client:
             LOGGER.warning("Production Tracking Client is not initialized yet!")
             return False
 
-        if not self._spreadsheets:
+        if not self.__class__._spreadsheets:
             LOGGER.warning("No Production Tracking Spreadsheets loaded!")
             return False
 
-        if not self._worksheets:
+        if not self.__class__._worksheets:
             LOGGER.warning("Production Tracking has no loaded data!")
             return False
 
@@ -120,7 +115,7 @@ class DriveTrackingManager(tracking.TrackingManager, object):
 
         creds = ServiceAccountCredentials._from_parsed_json_keyfile(dict(credentials), scope)
         try:
-            self._client = gspread.authorize(creds)
+            self.__class__._client = gspread.authorize(creds)
         except Exception(RuntimeError, ValueError) as exc:
             LOGGER.error('Error while logging into Drive Production Tracking ...')
             raise(exc)
@@ -132,13 +127,13 @@ class DriveTrackingManager(tracking.TrackingManager, object):
 
         for spreadsheet_name in spreadsheets:
             try:
-                open_sheet = self._client.open(spreadsheet_name)
-                self._spreadsheets.append(open_sheet)
+                open_sheet = self.__class__._client.open(spreadsheet_name)
+                self.__class__._spreadsheets.append(open_sheet)
             except gspread.client.SpreadsheetNotFound as exc:
                 LOGGER.warning('Production Tracking Sheet Document: "{}" does not exists!'.format(spreadsheet_name))
                 continue
 
-        if not self._spreadsheets:
+        if not self.__class__._spreadsheets:
             LOGGER.warning(
                 'Any of the spreadsheets defined in Drive Production Tracking Configuration File were valid!')
             return False
@@ -155,7 +150,7 @@ class DriveTrackingManager(tracking.TrackingManager, object):
             return None
 
         assets_worksheet_name = drive_lib.config.data.get('assets_worksheet_name', 'Assets')
-        assets_worksheet = self._worksheets.get(assets_worksheet_name, None)
+        assets_worksheet = self.__class__._worksheets.get(assets_worksheet_name, None)
         if not assets_worksheet:
             LOGGER.warning('No Assets Worksheet with name "{}" found in Drive Production Tracking Data!'.format(
                 assets_worksheet_name
@@ -196,6 +191,3 @@ class DriveTrackingManager(tracking.TrackingManager, object):
 
         with open(file_path, 'wb') as f:
             f.write(datatowrite)
-
-
-artellapipe.register.register_class('Tracker', DriveTrackingManager)
